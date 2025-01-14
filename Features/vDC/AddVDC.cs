@@ -9,7 +9,6 @@ namespace Paslauga.Features.vDC
     public class AddVDCRequest
     {
         public string Name { get; set; }  
-        public string? Description { get; set; }  
         public int? OrganisationId { get; set; }
         public int? VCPUMax { get; set; }
         public int? VCPUAllocated { get; set; }
@@ -22,6 +21,11 @@ namespace Paslauga.Features.vDC
     public class AddVDC : Endpoint<AddVDCRequest>
     {
         private readonly CloudDbContext _context;
+
+        public AddVDC(CloudDbContext context)
+        {
+            _context = context;
+        }
         public override void Configure()
         {
             Post("/add/vdc");
@@ -35,20 +39,25 @@ namespace Paslauga.Features.vDC
             {
                 Name = req.Name,
                 OrganisationId = req.OrganisationId,
+                VCPUMax = req.VCPUMax,
+                VCPUAllocated = req.VCPUAllocated,
+                VMemoryMax = req.VMemoryMax,
+                VMemoryAllocated = req.VMemoryAllocated,
+                VStorageMax = req.VStorageMax,
+                VStorageUsed = req.VStorageUsed
 
             };
 
-            // Add to the database
-            await _context.Set<VDC>().AddAsync(organisation, ct);
+            await _context.Set<VDC>().AddAsync(vdc, ct);
             await _context.SaveChangesAsync(ct);
 
             await SendAsync(new
             {
                 Message = "Sukurta.",
-                Organisation = organisation
+                VDC = vdc
             }, cancellation: ct);
         }
 
     }
-    }
+    
 }

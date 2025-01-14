@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Paslauga.Components;
 using Paslauga.Data;
+using Paslauga.Helpers;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +19,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddFastEndpoints();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -27,7 +29,6 @@ var app = builder.Build();
 app.UseFastEndpoints();
 app.UseSwaggerGen();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);

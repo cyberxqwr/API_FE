@@ -7,7 +7,7 @@ namespace Paslauga.Entities
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public Organisation Organisation { get; set; }
+        public Organisation? Organisation { get; set; }
         public int? OrganisationId { get; set; }
         public int? VCPUMax { get; set; }
         public int? VCPUAllocated { get; set; }
@@ -16,7 +16,7 @@ namespace Paslauga.Entities
         public int? VStorageMax { get; set; }
         public int? VStorageUsed { get; set; }
 
-        public int? NetworkPoolId { get; set; };
+        public int? NetworkPoolId { get; set; }
         public NetworkPool? NetworkPool { get; set; } = null;
 
         public ICollection<VM> VMs { get; set; } = new List<VM>();
@@ -28,7 +28,8 @@ namespace Paslauga.Entities
                 modelBuilder.Entity<VDC>()
                     .HasOne(np => np.NetworkPool)
                     .WithMany()
-                    .HasForeignKey(np => np.NetworkPoolId);
+                    .HasForeignKey(np => np.NetworkPoolId)
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 modelBuilder.Entity<VDC>()
                     .HasOne(o => o.Organisation)
@@ -66,7 +67,7 @@ namespace Paslauga.Entities
 
                 modelBuilder.Entity<VDC>()
                     .Property(np => np.NetworkPoolId)
-                    .HasDefaultValue(0);
+                    .HasDefaultValue(null);
                 #endregion
             }
         }

@@ -1,51 +1,52 @@
 ﻿using FastEndpoints;
 using Paslauga.Data;
-using Paslauga.Entities;
 
-namespace Paslauga.Features.Organisation
+namespace Paslauga.Features.NetworkPool
 {
 
-    public class AddOrganisationRequest
+    public class AddNetworkPoolRequest
     {
         public string Name { get; set; }  
-        public string Description { get; set; }  
+        public string? Description { get; set; }
+        public string? Status { get; set; }
     }
-    public class AddOrganisation : Endpoint<AddOrganisationRequest>
+    public class AddNetworkPool : Endpoint<AddNetworkPoolRequest>
     {
 
         private readonly CloudDbContext _context;
 
-        public AddOrganisation(CloudDbContext context)
+        public AddNetworkPool(CloudDbContext context)
         {
             _context = context;
         }
 
         public override void Configure()
         {
-            Post("/add/organisation"); 
+            Post("/add/networkpool"); 
             AllowAnonymous();          
         }
 
-        public override async Task HandleAsync(AddOrganisationRequest req, CancellationToken ct)
+        public override async Task HandleAsync(AddNetworkPoolRequest req, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(req.Name))
             {
                 ThrowError("Nera vardo.");
             }
 
-            var organisation = new Entities.Organisation
+            var npool = new Entities.NetworkPool
             {
                 Name = req.Name,
-                Description = req.Description
+                Description = req.Description,
+                Status = req.Status
             };
 
-            await _context.Set<Entities.Organisation>().AddAsync(organisation, ct);
+            await _context.Set<Entities.NetworkPool>().AddAsync(npool, ct);
             await _context.SaveChangesAsync(ct);
 
             await SendAsync(new
             {
                 Message = "Sukurta.",
-                Organisation = organisation
+                NetworkPool = npool
             }, cancellation: ct);
         }
     }

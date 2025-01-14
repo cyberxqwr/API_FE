@@ -1,34 +1,33 @@
 ﻿using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 using Paslauga.Data;
-using Paslauga.Entities;
 
-namespace Paslauga.Features.vDC
+namespace Paslauga.Features.NetworkPool
 {
-    public class ListVDCs : EndpointWithoutRequest
+    public class ListNetworkPools : EndpointWithoutRequest
     {
 
         private readonly CloudDbContext _context;
 
-        public ListVDCs(CloudDbContext context)
+        public ListNetworkPools(CloudDbContext context)
         {
             _context = context;
         }
         public override void Configure()
         {
-            Get("/list/vdcs");
+            Get("/list/networkpools");
             AllowAnonymous();
         }
 
         public override async Task HandleAsync(CancellationToken ct)
         {
-            if (_context?.VDC == null)
+            if (_context?.NetworkPool == null)
             {
-                await SendAsync("Tuscia", 500, ct);
+                await SendAsync("Tuscia", 404, ct);
                 return;
             }
 
-            var list = await _context.Set<VDC>().ToListAsync(ct);
+            var list = await _context.Set<Entities.NetworkPool>().ToListAsync();
             await SendAsync(list, 200, ct);
 
         }

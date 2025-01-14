@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Paslauga.Data;
 
@@ -10,9 +11,11 @@ using Paslauga.Data;
 namespace Paslauga.Migrations
 {
     [DbContext(typeof(CloudDbContext))]
-    partial class CloudDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250113225741_update")]
+    partial class update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -362,7 +365,9 @@ namespace Paslauga.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("NetworkPoolId")
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<int?>("OrganisationId")
                         .ValueGeneratedOnAdd()
@@ -541,8 +546,7 @@ namespace Paslauga.Migrations
                 {
                     b.HasOne("Paslauga.Entities.NetworkPool", "NetworkPool")
                         .WithMany()
-                        .HasForeignKey("NetworkPoolId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("NetworkPoolId");
 
                     b.HasOne("Paslauga.Entities.Organisation", "Organisation")
                         .WithMany()
