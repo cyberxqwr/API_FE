@@ -5,9 +5,10 @@ namespace Paslauga.Entities
     public class VM
     {
         public int Id { get; set; }
-
+        public int VLANId { get; set; }
         public int VDCId { get; set; }
-        public VDC VDC { get; set; }
+        public VDC? VDC { get; set; }
+        public VLAN? VLAN { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public string OSName { get; set; }
@@ -28,6 +29,11 @@ namespace Paslauga.Entities
                 .HasOne(vm => vm.VDC)
                 .WithMany(vm => vm.VMs)
                 .HasForeignKey(vm => vm.VDCId);
+
+            modelBuilder.Entity<VM>()
+                .HasOne(vm => vm.VLAN)
+                .WithMany()
+                .HasForeignKey(vm => vm.VLANId);
         }
     }
 }

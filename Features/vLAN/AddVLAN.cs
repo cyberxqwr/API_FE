@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
 using Paslauga.Data;
 using Paslauga.Entities;
 using Paslauga.Helpers;
@@ -71,7 +72,7 @@ namespace Paslauga.Features.vLAN
             await _context.Set<VLAN>().AddAsync(vlan, ct);
             await _context.SaveChangesAsync(ct);
 
-            vlan = await _context.Set<VLAN>().FindAsync(new object[] { req.Name }, ct);
+            vlan = await _context.Set<VLAN>().FirstOrDefaultAsync(o => o.Name == req.Name && o.GatewayCIDR == req.GatewayCIDR, ct);
 
             if (vlan == null)
             {

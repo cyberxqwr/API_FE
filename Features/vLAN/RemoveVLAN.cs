@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using Microsoft.EntityFrameworkCore;
+using FastEndpoints;
 using Paslauga.Data;
 using Paslauga.Entities;
 
@@ -35,10 +36,28 @@ namespace Paslauga.Features.vLAN
                 return;
             }
 
-            var associatedIPs = _context.Set<AvailableIPs>().Where(ip => ip.VLANId == vlan.Id);
-            _context.Set<AvailableIPs>().RemoveRange(associatedIPs);
-            _context.Set<VLAN>().Remove(vlan);
+            var associatedIPsList = await _context.Set<AvailableIPs>()
+                .Where(ip => ip.VLANId == vlan.Id)
+                .Select(ip => ip.IPAddress)
+                .ToListAsync(ct);
 
+            var vmUsingIP = await _context.Set<Entities.VM>()
+                .FirstOrDefaultAsync(vm => associatedIPsList.Contains(vm.AllocatedIP), ct);
+
+            if (vmUsingIP != null)
+            {
+                await SendAsync(new
+                {
+                    Message = $"Negalima istrinti. VM '{vmUsingIP.Name}' naudoja si IP."
+                }, 400, ct);
+
+                return;
+            }
+
+            _context.Set<AvailableIPs>().RemoveRange(
+                _context.Set<AvailableIPs>().Where(ip => ip.VLANId == vlan.Id)
+            );
+            _context.Set<VLAN>().Remove(vlan);
             await _context.SaveChangesAsync(ct);
 
             await SendAsync(new
