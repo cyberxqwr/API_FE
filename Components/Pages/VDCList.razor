@@ -1,0 +1,76 @@
+﻿@page "/vdcs"
+@using Paslauga.Helpers
+@using Paslauga.Entities
+@inject ApiService ApiService
+
+<h3>VDC List</h3>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (vdcs == null || !vdcs.Any())
+{
+    <p>No VDCs available.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Organisation</th>
+                <th>Resources</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vdc in vdcs)
+            {
+                <tr>
+                    <td>@vdc.Id</td>
+                    <td>@vdc.Name</td>
+                    <td>@OrganisationNames.GetValueOrDefault(vdc.OrganisationId, "NoN")</td>
+                    <td>
+                        CPU: @vdc.VCPUAllocated / @vdc.VCPUMax<br />
+                        RAM: @vdc.VMemoryAllocated / @vdc.VMemoryMax GB<br />
+                        Storage: @vdc.VStorageUsed / @vdc.VStorageMax GB
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<VDC> vdcs = new();
+    private bool isLoading = true;
+    private Dictionary<int?, string> OrganisationNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            vdcs = await ApiService.GetVDCsAsync();
+
+            var organisationIds = vdcs.Select(vdc => vdc.OrganisationId).Distinct().ToList();
+            foreach (var orgId in organisationIds)
+            {
+                var organisation = await ApiService.GetORGAsync(orgId);
+                if (organisation != null)
+                {
+                    OrganisationNames[orgId] = organisation.Name;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching VDCs: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

@@ -24,6 +24,11 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddHttpClient<ApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5200");
+});
+
 var app = builder.Build();
 
 app.UseFastEndpoints();
