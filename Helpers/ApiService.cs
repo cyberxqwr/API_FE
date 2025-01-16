@@ -17,6 +17,11 @@ namespace Paslauga.Helpers
             return await _httpClient.GetFromJsonAsync<T>(url);
         }
 
+        public async Task<List<T>> GetAsyncList<T>(string url)
+        {
+            return await _httpClient.GetFromJsonAsync<List<T>>(url);
+        }
+
         public async Task<HttpResponseMessage> PostAsync<T>(string url, T data)
         {
             return await _httpClient.PostAsJsonAsync(url, data);

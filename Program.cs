@@ -33,6 +33,7 @@ var app = builder.Build();
 
 app.UseFastEndpoints();
 app.UseSwaggerGen();
+app.UsePathBase("/dashboard");
 
 if (!app.Environment.IsDevelopment())
 {

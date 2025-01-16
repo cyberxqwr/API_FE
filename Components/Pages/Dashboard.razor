@@ -1,0 +1,62 @@
+﻿@layout Layout.A_SideBarLayout
+@page "/dashboard"
+@using Paslauga.Helpers
+@using Paslauga.Entities
+@inject ApiService ApiService
+
+<PageTitle>LWS Dashboard</PageTitle>
+
+@if (isLoading)
+{
+	<p>Loading...</p>
+}
+
+<div class="container text-center">
+	<div class="row mb-5">
+		<div class="col bg-light p-3 border">
+			<h2>vDCS</h2>
+			<p>@vdcs.Count()</p>
+		</div>
+		<div class="col bg-light p-3 border">
+			<h2>VMs</h2>
+			<p>@vms.Count()</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col bg-light p-3 border">
+			<h2>Resources</h2>
+			<p>Info</p>
+		</div>
+		<div class="col bg-light p-3 border">
+			<h2>Available IPs</h2>
+			<p>@availableIps.Count()</p>
+		</div>
+	</div>
+</div>
+
+@code {
+	private List<VDC> vdcs = new();
+	private List<VM> vms = new();
+	private List<AvailableIPs> availableIps = new();
+	private bool isLoading = true;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+
+			vdcs = await ApiService.GetAsyncList<VDC>("list/vdcs");
+			vms = await ApiService.GetAsyncList<VM>("list/vm");
+			availableIps = await ApiService.GetAsyncList<AvailableIPs>("list/ip");
+
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error fetching VDCs: {ex.Message}");
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+}
