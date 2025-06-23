@@ -25,4 +25,4 @@ namespace Paslauga.Entities
         }
 
     }
-}
+} 
